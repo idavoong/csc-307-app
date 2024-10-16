@@ -17,12 +17,14 @@ function MyApp() {
 
   function updateList(person) {
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
+      .then((newUser) => {
+        if (newUser === undefined) {
+          throw new Error("Error: Resource not created.");
+        }
+        setCharacters([...characters, newUser])})
       .catch((error) => {
         console.log(error);
       });
-
-    console.log(characters)
   }
 
   function fetchUsers() {
@@ -37,13 +39,13 @@ function MyApp() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(person),
-    });
-
-    promise.then((res) => {
-      return res.json();
-    }).catch((error) => {
-      console.log(error);
-    });
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     return promise;
   }
@@ -52,16 +54,6 @@ function MyApp() {
     const promise = fetch(`http://localhost:8000/users/${id}`, {
       method: "DELETE",
     });
-
-    promise.then(() => {
-      const updated = characters.filter((character) => {
-        return character.id !== id;
-      });
-      setCharacters(updated);
-    }).catch((error) => {
-      console.log(error);
-    });
-
     return promise;
   }
 

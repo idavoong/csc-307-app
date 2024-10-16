@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
@@ -47,6 +48,7 @@ const findUserByNameAndJob = (name, job) => {
 };
 
 const addUser = (user) => {
+  user["id"] = String(Math.random());
   users["users_list"].push(user);
   return user;
 };
@@ -57,6 +59,8 @@ const deleteUser = (id) => {
 };
 
 app.use(express.json());
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -90,14 +94,14 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  const newUser = addUser(userToAdd);
+  res.status(201).send(newUser);
 });
 
 app.delete("/users/:id", (req, res) => {
   const id = req.params.id;
   deleteUser(id);
-  res.send();
+  res.status(204).send();
 });
 
 app.listen(port, () => {
